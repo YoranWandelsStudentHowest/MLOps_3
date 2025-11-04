@@ -60,7 +60,7 @@ jobs:
         shell: powershell
         run: docker ps
 
-      # Optional: Test that Nginx is responding
+      # Test that Nginx is responding
       - name: Test Nginx container
         shell: powershell
         run: Invoke-WebRequest -Uri "http://localhost:8080" -UseBasicParsing
