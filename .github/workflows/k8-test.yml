@@ -25,7 +25,7 @@ jobs:
       # 3. Pas de pod-template aan en deploy naar Kubernetes
       - name: Apply pod manifest
         run: |
-          $template = Get-Content k8s/pod-template.yaml
+          $template = Get-Content k8s/pod-template.yml
           $podYaml = $template -replace '\$\{ID\}', $env:ID
           $podYaml | kubectl apply -f -
           Write-Host "Pod manifest applied with ID: $env:ID"
