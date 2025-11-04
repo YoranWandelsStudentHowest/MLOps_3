@@ -1,41 +1,56 @@
-name: Deploy NGINX to Kubernetes
+name: Kubernetes Test Deployment
 
 on:
-  workflow_dispatch:    # handmatige trigger
+  workflow_dispatch:
   push:
     branches:
-      - main           # bij push naar main
+      - main
 
 jobs:
-  deploy-nginx:
+  deploy-k8s:
     runs-on: self-hosted
     steps:
-      # 1. Code ophalen
+      # 1. Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2. Controleer of namespace bestaat, maak aan indien nodig
+      # 2. Namespace aanmaken indien nodig
       - name: Ensure namespace exists
         run: |
           kubectl get namespace howest-fastapi || kubectl create namespace howest-fastapi
         shell: powershell
 
-      # 3. Deploy NGINX Deployment
+      # 3. Pod (random) deployen - optioneel, als test
+      - name: Deploy random Pod
+        run: |
+          $RandomID = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+          echo "ID=$RandomID" >> $env:GITHUB_ENV
+          $template = Get-Content k8s/pod-template.yml
+          $podYaml = $template -replace '\$\{ID\}', $env:ID
+          $podYaml | kubectl apply -f -
+          Write-Host "Pod manifest applied with ID: $env:ID"
+        shell: powershell
+
+      # 4. Deployment + Service aanmaken
       - name: Apply Deployment
         run: kubectl apply -f k8s/nginx-deployment.yml
         shell: powershell
 
-      # 4. Deploy NGINX Service
       - name: Apply Service
         run: kubectl apply -f k8s/nginx-service.yml
         shell: powershell
 
-      # 5. Controleer Pods
+      # 5. Check pods
       - name: Check pod status
         run: kubectl get pods -n howest-fastapi
         shell: powershell
 
-      # 6. Controleer Service
+      # 6. Check service
       - name: Check service
         run: kubectl get svc -n howest-fastapi
+        shell: powershell
+
+      # 7. Deployment rollout (indien update nodig)
+      - name: Rollout restart deployment
+        run: kubectl rollout restart deployment nginx-deployment -n howest-fastapi
         shell: powershell
