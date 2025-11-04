@@ -26,17 +26,17 @@ jobs:
               Write-Host "Namespace 'howest-fastapi' created."
           }
 
-      # 3. Optioneel: deploy random test Pod
-      - name: Deploy random Pod
-        shell: powershell
-        run: |
-          $RandomID = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
-          echo "ID=$RandomID" >> $env:GITHUB_ENV
-          Write-Host "Generated Pod ID: $RandomID"
-          $template = Get-Content k8s/pod-template.yml
-          $podYaml = $template -replace '\$\{ID\}', $env:ID
-          $podYaml | kubectl apply -f -
-          Write-Host "Pod manifest applied with ID: $env:ID"
+      # # 3. Optioneel: deploy random test Pod
+      # - name: Deploy random Pod
+      #   shell: powershell
+      #   run: |
+      #     $RandomID = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+      #     echo "ID=$RandomID" >> $env:GITHUB_ENV
+      #     Write-Host "Generated Pod ID: $RandomID"
+      #     $template = Get-Content k8s/pod-template.yml
+      #     $podYaml = $template -replace '\$\{ID\}', $env:ID
+      #     $podYaml | kubectl apply -f -
+      #     Write-Host "Pod manifest applied with ID: $env:ID"
 
       # 4. Deployment + Service aanmaken
       - name: Apply Deployment
