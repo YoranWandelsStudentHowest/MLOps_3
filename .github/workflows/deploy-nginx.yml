@@ -47,9 +47,15 @@ jobs:
         run: kubectl rollout restart deployment nginx-deployment -n howest-fastapi
 
       # Helm install/upgrade
-      - name: Install or Upgrade Helm chart
+      - name: Helm install Bitnami nginx
         shell: powershell
         run: |
+          helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo update
-          helm upgrade --install my-nginx ./charts/nginx --namespace howest-fastapi --create-namespace --set image.tag=1.21.0
+          helm upgrade --install my-nginx bitnami/nginx `
+            --namespace howest-fastapi `
+            --create-namespace `
+            --set service.type=NodePort `
+            --set service.nodePorts.http=30080 `
+            --set image.tag=1.21.0
 
