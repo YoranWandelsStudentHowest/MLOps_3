@@ -56,6 +56,6 @@ jobs:
             --namespace howest-fastapi `
             --create-namespace `
             --set service.type=NodePort `
-            --set service.nodePorts.http=30080 `
+            --set service.nodePorts.http=30081 `
             --set image.tag=1.21.0
 
