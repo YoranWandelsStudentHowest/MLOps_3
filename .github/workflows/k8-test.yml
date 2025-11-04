@@ -1,0 +1,26 @@
+name: Kubernetes Test Deployment
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-pod:
+    runs-on: self-hosted
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set pod random ID
+        run: echo "RANDOM_ID=$(head /dev/urandom | tr -dc a-z0-9 | head -c 6)" >> $GITHUB_ENV
+
+      - name: Apply pod manifest
+        run: |
+          envsubst < k8s/pod-template.yml | kubectl apply -f -
+        env:
+          ID: ${{ env.RANDOM_ID }}
+
+      - name: Check pod status
+        run: kubectl get pods -n howest-fastapi
