@@ -51,7 +51,5 @@ jobs:
         shell: powershell
         run: |
           helm repo update
-          helm upgrade --install my-nginx ./charts/nginx \
-            --namespace howest-fastapi \
-            --create-namespace \
-            --set image.tag=1.21.0
+          helm upgrade --install my-nginx ./charts/nginx --namespace howest-fastapi --create-namespace --set image.tag=1.21.0
+
