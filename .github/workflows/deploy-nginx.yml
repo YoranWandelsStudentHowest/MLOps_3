@@ -10,7 +10,7 @@ jobs:
   deploy-k8s:
     runs-on: self-hosted
     steps:
-      # 1. Checkout repo
+      # 1. Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -21,44 +21,43 @@ jobs:
           try {
               kubectl get namespace howest-fastapi | Out-Null
               Write-Host "Namespace 'howest-fastapi' already exists."
-          }
-          catch {
+          } catch {
               kubectl create namespace howest-fastapi
               Write-Host "Namespace 'howest-fastapi' created."
           }
 
-
-      # 3. Pod (random) deployen - optioneel, als test
+      # 3. Optioneel: deploy random test Pod
       - name: Deploy random Pod
+        shell: powershell
         run: |
           $RandomID = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
           echo "ID=$RandomID" >> $env:GITHUB_ENV
+          Write-Host "Generated Pod ID: $RandomID"
           $template = Get-Content k8s/pod-template.yml
           $podYaml = $template -replace '\$\{ID\}', $env:ID
           $podYaml | kubectl apply -f -
           Write-Host "Pod manifest applied with ID: $env:ID"
-        shell: powershell
 
       # 4. Deployment + Service aanmaken
       - name: Apply Deployment
-        run: kubectl apply -f k8s/nginx-deployment.yml
         shell: powershell
+        run: kubectl apply -f k8s/nginx-deployment.yml
 
       - name: Apply Service
-        run: kubectl apply -f k8s/nginx-service.yml
         shell: powershell
+        run: kubectl apply -f k8s/nginx-service.yml
 
       # 5. Check pods
       - name: Check pod status
-        run: kubectl get pods -n howest-fastapi
         shell: powershell
+        run: kubectl get pods -n howest-fastapi
 
       # 6. Check service
       - name: Check service
+        shell: powershell
         run: kubectl get svc -n howest-fastapi
-        shell: powershell
 
-      # 7. Deployment rollout (indien update nodig)
+      # 7. Rollout restart Deployment (voor updates)
       - name: Rollout restart deployment
-        run: kubectl rollout restart deployment nginx-deployment -n howest-fastapi
         shell: powershell
+        run: kubectl rollout restart deployment nginx-deployment -n howest-fastapi
