@@ -38,4 +38,4 @@ jobs:
       # Optional: Test that Nginx is responding
       - name: Test Nginx container
         run: |
-          curl -s http://localhost:8080
+          Invoke-WebRequest -Uri "http://localhost:8080" -UseBasicParsing
