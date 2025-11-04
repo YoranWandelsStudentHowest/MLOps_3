@@ -16,14 +16,17 @@ jobs:
 
       # 2. Namespace aanmaken indien nodig
       - name: Ensure namespace exists
+        shell: powershell
         run: |
-          if (-not (kubectl get namespace howest-fastapi -ErrorAction SilentlyContinue)) {
-              kubectl create namespace howest-fastapi
-              Write-Host "Namespace 'howest-fastapi' created."
-          } else {
+          try {
+              kubectl get namespace howest-fastapi | Out-Null
               Write-Host "Namespace 'howest-fastapi' already exists."
           }
-        shell: powershell
+          catch {
+              kubectl create namespace howest-fastapi
+              Write-Host "Namespace 'howest-fastapi' created."
+          }
+
 
       # 3. Pod (random) deployen - optioneel, als test
       - name: Deploy random Pod
