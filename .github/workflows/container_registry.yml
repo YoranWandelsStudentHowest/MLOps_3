@@ -19,7 +19,7 @@ jobs:
       - name: Build Docker image
         shell: powershell
         run: |
-          $IMAGE_NAME = "hello-world-nginx"
+          $IMAGE_NAME = "ghcr.io/YoranWandelsStudentHowest/hello-world-nginx"
           $BRANCH_TAG = $env:GITHUB_REF_NAME
           $SHA_TAG = $env:GITHUB_SHA
 
