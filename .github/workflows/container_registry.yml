@@ -26,6 +26,23 @@ jobs:
           Write-Host "Building Docker image..."
           docker build -t "${IMAGE_NAME}:latest" -t "${IMAGE_NAME}:${BRANCH_TAG}" -t "${IMAGE_NAME}:${SHA_TAG}" .
 
+      # Login to GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      # Push Docker images to GHCR
+      - name: Push Docker image
+        shell: powershell
+        run: |
+          $IMAGE_NAME = "ghcr.io/yoranwandelsstudenthowest/hello-world-nginx"
+          $BRANCH_TAG = $env:GITHUB_REF_NAME
+          $SHA_TAG = $env:GITHUB_SHA
+
+          Write-Host "Pushing Docker image..."
+          docker push "${IMAGE_NAME}:latest"
+          docker push "${IMAGE_NAME}:${BRANCH_TAG}"
+          docker push "${IMAGE_NAME}:${SHA_TAG}"
+
       # Stop and remove old container if exists, then run new container
       - name: Run Docker container
         shell: powershell
