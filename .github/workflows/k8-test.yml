@@ -10,19 +10,27 @@ jobs:
   deploy-pod:
     runs-on: self-hosted
     steps:
+      # 1. Haal de code op
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      # 2. Genereer een random ID voor de pod
       - name: Set pod random ID
         run: |
           $RandomID = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
           echo "ID=$RandomID" >> $env:GITHUB_ENV
+          Write-Host "Generated Pod ID: $RandomID"
         shell: powershell
 
+      # 3. Pas de pod-template aan en deploy naar Kubernetes
       - name: Apply pod manifest
         run: |
-          (Get-Content k8s/pod-template.yaml) -replace '\$\{ID\}', $env:ID | kubectl apply -f -
+          $template = Get-Content k8s/pod-template.yaml
+          $podYaml = $template -replace '\$\{ID\}', $env:ID
+          $podYaml | kubectl apply -f -
+          Write-Host "Pod manifest applied with ID: $env:ID"
         shell: powershell
 
+      # 4. Controleer of de pod draait in de juiste namespace
       - name: Check pod status
         run: kubectl get pods -n howest-fastapi
