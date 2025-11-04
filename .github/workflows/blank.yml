@@ -17,6 +17,7 @@ jobs:
 
       # Build the Docker image
       - name: Build Docker image
+        shell: pwsh
         run: |
           IMAGE_NAME=hello-world-nginx
           BRANCH_TAG=${GITHUB_REF_NAME}
