@@ -1,0 +1,21 @@
+# Self-hosted GitHub Actions runner
+/actions-runner/
+/actions-runner-win-x64-*.zip
+/config.cmd
+/run.cmd
+/run-helper*
+*.credentials*
+
+# Diagnostic / helper folders
+/_diag/
+/bin/
+/cd/
+/externals/
+
+# OS / Editor files
+*.log
+*.tmp
+*.bak
+*.swp
+
+.runner
