@@ -19,12 +19,12 @@ jobs:
       - name: Build Docker image
         shell: powershell
         run: |
-          IMAGE_NAME=hello-world-nginx
-          BRANCH_TAG=${GITHUB_REF_NAME}
-          SHA_TAG=${GITHUB_SHA}
+          $IMAGE_NAME = "hello-world-nginx"
+          $BRANCH_TAG = $env:GITHUB_REF_NAME
+          $SHA_TAG = $env:GITHUB_SHA
 
-          echo "Building Docker image..."
-          docker build -t $IMAGE_NAME:latest -t $IMAGE_NAME:$BRANCH_TAG -t $IMAGE_NAME:$SHA_TAG .
+          Write-Host "Building Docker image..."
+          docker build -t "$IMAGE_NAME:latest" -t "$IMAGE_NAME:$BRANCH_TAG" -t "$IMAGE_NAME:$SHA_TAG" .
 
       # Run the Docker container in detached mode
       - name: Run Docker container
