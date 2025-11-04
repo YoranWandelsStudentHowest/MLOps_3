@@ -1,0 +1,41 @@
+name: Deploy NGINX to Kubernetes
+
+on:
+  workflow_dispatch:    # handmatige trigger
+  push:
+    branches:
+      - main           # bij push naar main
+
+jobs:
+  deploy-nginx:
+    runs-on: self-hosted
+    steps:
+      # 1. Code ophalen
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Controleer of namespace bestaat, maak aan indien nodig
+      - name: Ensure namespace exists
+        run: |
+          kubectl get namespace howest-fastapi || kubectl create namespace howest-fastapi
+        shell: powershell
+
+      # 3. Deploy NGINX Deployment
+      - name: Apply Deployment
+        run: kubectl apply -f k8s/nginx-deployment.yml
+        shell: powershell
+
+      # 4. Deploy NGINX Service
+      - name: Apply Service
+        run: kubectl apply -f k8s/nginx-service.yml
+        shell: powershell
+
+      # 5. Controleer Pods
+      - name: Check pod status
+        run: kubectl get pods -n howest-fastapi
+        shell: powershell
+
+      # 6. Controleer Service
+      - name: Check service
+        run: kubectl get svc -n howest-fastapi
+        shell: powershell
