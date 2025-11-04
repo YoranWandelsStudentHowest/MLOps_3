@@ -14,7 +14,10 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Set pod random ID
-        run: echo "RANDOM_ID=$(head /dev/urandom | tr -dc a-z0-9 | head -c 6)" >> $GITHUB_ENV
+        run: |
+          $RandomID = -join ((48..57) + (97..122) | Get-Random -Count 6 | % {[char]$_})
+          echo "ID=$RandomID" >> $env:GITHUB_ENV
+        shell: powershell
 
       - name: Apply pod manifest
         run: |
