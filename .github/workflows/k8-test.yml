@@ -21,9 +21,8 @@ jobs:
 
       - name: Apply pod manifest
         run: |
-          envsubst < k8s/pod-template.yml | kubectl apply -f -
-        env:
-          ID: ${{ env.RANDOM_ID }}
+          (Get-Content k8s/pod-template.yaml) -replace '\$\{ID\}', $env:ID | kubectl apply -f -
+        shell: powershell
 
       - name: Check pod status
         run: kubectl get pods -n howest-fastapi
