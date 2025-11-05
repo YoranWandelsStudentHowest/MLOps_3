@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GROUP: MLOps
-      WORKSPACE: myworkspace
+      WORKSPACE: wandels-yoran-ml
       SUBSCRIPTION_ID: 19fe6b9f-c4f7-46ad-8824-f9af7431cbed
       LOCATION: westeurope
 
@@ -26,41 +26,17 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Setup Python
-      - name: Setup Python
-        uses: actions/setup-python@v4
+      # Azure CLI commando's uitvoeren zoals je leerkracht aangaf
+      - name: Azure test - Get Compute
+        uses: Azure/CLI@v2.1.0
         with:
-          python-version: 3.11
+          azcliversion: 2.64.0
+          inlineScript: |
+            # Installeer ML extensie
+            az extension add --name ml
 
-      # Install Azure ML SDK
-      - name: Install Azure ML SDK
-        run: |
-          pip install azure-ai-ml azure-identity
+            # Standaard parameters instellen
+            az configure --defaults group=$GROUP workspace=$WORKSPACE location=$LOCATION
 
-      # List Azure ML Compute via Python SDK
-      - name: List Azure ML Compute
-        run: |
-          python - <<EOF
-          import os
-          from azure.identity import DefaultAzureCredential
-          from azure.ai.ml import MLClient
-
-          # Environment variables
-          subscription_id = os.environ["SUBSCRIPTION_ID"]
-          resource_group = os.environ["GROUP"]
-          workspace = os.environ["WORKSPACE"]
-
-          # Authenticate and create ML client
-          credential = DefaultAzureCredential()
-          client = MLClient(
-              credential=credential,
-              subscription_id=subscription_id,
-              resource_group_name=resource_group,
-              workspace_name=workspace
-          )
-
-          # List all compute targets
-          print("Compute targets in workspace:")
-          for compute in client.compute.list():
-              print(f"- {compute.name} ({compute.type})")
-          EOF
+            # Compute lijst ophalen
+            az ml compute list
