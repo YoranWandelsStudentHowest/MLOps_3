@@ -16,27 +16,49 @@ jobs:
       LOCATION: westeurope
 
     steps:
-      # Checkout repo (optioneel)
+      # Checkout repo (optional)
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Login bij Azure via SP
+      # Login to Azure via Service Principal
       - name: Azure Login
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Azure CLI commando's uitvoeren zoals je leerkracht aangaf
-      - name: Azure test - Get Compute
-        uses: Azure/CLI@v2.1.0
+      # Setup Python environment
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          azcliversion: 2.63.0
-          inlineScript: |
-            # Installeer ML extensie
-            az extension add --name ml
+          python-version: 3.11
 
-            # Standaard parameters instellen
-            az configure --defaults group=$GROUP workspace=$WORKSPACE location=$LOCATION
+      # Install Azure ML SDK
+      - name: Install Azure ML SDK
+        run: |
+          pip install --upgrade pip
+          pip install azure-ai-ml azure-identity
 
-            # Compute lijst ophalen
-            az ml compute list
+      # List Azure ML compute targets using Python SDK
+      - name: List Azure ML Compute
+        run: |
+          python - <<EOF
+          import os
+          from azure.identity import DefaultAzureCredential
+          from azure.ai.ml import MLClient
+
+          subscription_id = os.environ["SUBSCRIPTION_ID"]
+          resource_group = os.environ["GROUP"]
+          workspace = os.environ["WORKSPACE"]
+
+          credential = DefaultAzureCredential()
+          client = MLClient(
+              credential=credential,
+              subscription_id=subscription_id,
+              resource_group_name=resource_group,
+              workspace_name=workspace
+          )
+
+          print("Compute targets in workspace:")
+          for compute in client.compute.list():
+              print(f"- {compute.name} ({compute.type})")
+          EOF
