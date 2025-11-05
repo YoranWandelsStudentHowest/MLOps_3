@@ -1,61 +1,61 @@
-name: Kubernetes + Helm Deployment
+# name: Kubernetes + Helm Deployment
 
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+# on:
+#   workflow_dispatch:
+#   push:
+#     branches:
+#       - main
 
-jobs:
-  deploy-k8s:
-    runs-on: self-hosted
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+# jobs:
+#   deploy-k8s:
+#     runs-on: self-hosted
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v3
 
-      - name: Ensure namespace exists
-        shell: powershell
-        run: |
-          try {
-              kubectl get namespace howest-fastapi | Out-Null
-              Write-Host "Namespace exists."
-          } catch {
-              kubectl create namespace howest-fastapi
-              Write-Host "Namespace created."
-          }
+#       - name: Ensure namespace exists
+#         shell: powershell
+#         run: |
+#           try {
+#               kubectl get namespace howest-fastapi | Out-Null
+#               Write-Host "Namespace exists."
+#           } catch {
+#               kubectl create namespace howest-fastapi
+#               Write-Host "Namespace created."
+#           }
 
-      # Deploy Deployment + Service
-      - name: Apply Deployment
-        shell: powershell
-        run: kubectl apply -f k8s/nginx-deployment.yml
+#       # Deploy Deployment + Service
+#       - name: Apply Deployment
+#         shell: powershell
+#         run: kubectl apply -f k8s/nginx-deployment.yml
 
-      - name: Apply Service
-        shell: powershell
-        run: kubectl apply -f k8s/nginx-service.yml
+#       - name: Apply Service
+#         shell: powershell
+#         run: kubectl apply -f k8s/nginx-service.yml
 
-      - name: Check pods
-        shell: powershell
-        run: kubectl get pods -n howest-fastapi
+#       - name: Check pods
+#         shell: powershell
+#         run: kubectl get pods -n howest-fastapi
 
-      - name: Check service
-        shell: powershell
-        run: kubectl get svc -n howest-fastapi
+#       - name: Check service
+#         shell: powershell
+#         run: kubectl get svc -n howest-fastapi
 
-      # Rollout restart (update Deployment)
-      - name: Rollout restart deployment
-        shell: powershell
-        run: kubectl rollout restart deployment nginx-deployment -n howest-fastapi
+#       # Rollout restart (update Deployment)
+#       - name: Rollout restart deployment
+#         shell: powershell
+#         run: kubectl rollout restart deployment nginx-deployment -n howest-fastapi
 
-      # Helm install/upgrade
-      - name: Helm install Bitnami nginx
-        shell: powershell
-        run: |
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo update
-          helm upgrade --install my-nginx bitnami/nginx `
-            --namespace howest-fastapi `
-            --create-namespace `
-            --set service.type=NodePort `
-            --set service.nodePorts.http=30081 `
-            --set image.tag=1.21.0
+#       # Helm install/upgrade
+#       - name: Helm install Bitnami nginx
+#         shell: powershell
+#         run: |
+#           helm repo add bitnami https://charts.bitnami.com/bitnami
+#           helm repo update
+#           helm upgrade --install my-nginx bitnami/nginx `
+#             --namespace howest-fastapi `
+#             --create-namespace `
+#             --set service.type=NodePort `
+#             --set service.nodePorts.http=30081 `
+#             --set image.tag=1.21.0
 

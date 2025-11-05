@@ -1,0 +1,38 @@
+name: Azure ML Compute List
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  azure-ml:
+    runs-on: ubuntu-latest
+    env:
+      GROUP: MLOps
+      WORKSPACE: myworkspace
+      LOCATION: westeurope
+
+    steps:
+
+      # Login bij Azure via SP
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Azure CLI commando's uitvoeren
+      - name: List Azure ML Compute
+        uses: Azure/CLI@v2.1.0
+        with:
+          azcliversion: 2.64.0
+          inlineScript: |
+            # Installeer ML extensie als die nog niet bestaat
+            az extension show -n ml || az extension add --name ml
+
+            # Standaard parameters instellen
+            az configure --defaults group=$GROUP workspace=$WORKSPACE location=$LOCATION
+
+            # Compute lijst ophalen
+            az ml compute list
