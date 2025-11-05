@@ -16,7 +16,7 @@ jobs:
       LOCATION: westeurope
 
     steps:
-      # Checkout repo (optional)
+      # Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
