@@ -18,5 +18,5 @@
 *.bak
 *.swp
 
-.runner
+.runner*
 _work
